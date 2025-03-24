@@ -1,0 +1,49 @@
+Step: -1 Download and install geth.   
+Step: -2 Open CMD and enter “geth” to start the geth.
+Step: -3 Open a new CMD window to get attach with geth node. Using command. geth attach ipc://./pipe/geth.ipc  
+Step: -4 Now we will create a new account using command  personal.newAccount() 
+Step: -5 To see the all details about blockchain we will use eth.synching 
+Step: -6 Now we will create a new folder and create a genesis.json file in it. 
+
+genesis.json 
+{
+  "config": {
+    "chainId": 18,
+    "homesteadBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip158Block": 0,
+    "byzantiumBlock": 0,
+    "constantinopleBlock": 0,
+    "petersburgBlock": 0,
+    "ethash": {}
+  },
+  "difficulty": "0x20000",
+  "gasLimit": "0x9000000",
+  "alloc": {}
+}
+
+
+geth --datadir ./Eth init genesis.json
+
+
+in terminal of vscode in folder where genesis file is saved command  geth --datadir ./Eth init genesis.json
+
+
+tep: -8 now we will start the node using command. geth --datadir .\Eth\ -- nodiscover 
+
+Step: -9 Now we will create a new account on our private blockchain for mining. So open 
+a new command window and run geth attach ipc://./pipe/geth.ipc   
+And check for any account using command eth.accounts  
+If there is no any account, we will create one.  
+
+
+
+Step: -10 Now we will set this account as miner using command  
+miner.setEtherbase(eth.accounts[0]) where “0” is the index number of eth.accounts array. 
+
+
+
+geth --datadir ./Eth --networkid 18 console
+
+miner.start(1)
