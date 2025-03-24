@@ -1,0 +1,120 @@
+Question. Write the following programs for Blockchain in Python:   
+a. A simple client class that generates the private and public keys by using the built-in 
+Python RSA algorithm and tests it.   
+b. A transaction class to send and receive money and test it.   
+
+
+#A
+# new plus code
+
+
+
+
+
+pip install pycryptodome
+
+
+
+
+# new plus code
+
+
+# Make sure to install the pycryptodome package by running the following command in your terminal:
+# pip install pycryptodome
+
+from Crypto import Random
+from Crypto.Hash import SHA
+from Crypto.PublicKey import RSA
+from Crypto.Signature import PKCS1_v1_5
+import binascii
+
+class Client:
+    def __init__(self):
+        # Use Crypto.Random's read function for generating randomness.
+        random_gen = Random.new().read
+        self._private_key = RSA.generate(1024, random_gen)
+        self._public_key = self._private_key.publickey()
+        self._signer = PKCS1_v1_5.new(self._private_key)
+    
+    @property
+    def identity(self):
+        # Export the public key in DER format, then hexlify and decode it.
+        return binascii.hexlify(self._public_key.exportKey(format='DER')).decode('ascii')
+
+# Create a client instance and display its identity.
+Dinesh = Client()
+print(Dinesh.identity)
+
+
+
+
+
+
+
+
+#B
+
+
+import datetime
+import collections
+import binascii
+from Crypto.Hash import SHA
+from Crypto.Signature import PKCS1_v1_5
+
+# Assuming the Client class is defined as in part (a) and imported here.
+# For example:
+# from your_module import Client
+
+class Transaction:
+    def __init__(self, sender, recipient, value):
+        self.sender = sender           # sender is a Client object
+        self.recipient = recipient     # recipient can be a Client or its identity
+        self.value = value
+        self.time = datetime.datetime.now()
+    
+    def to_dict(self):
+        # If the sender is "Genesis", return it as such; otherwise use the client's identity.
+        if self.sender == "Genesis":
+            identity = "Genesis"
+        else:
+            identity = self.sender.identity
+        return collections.OrderedDict({
+            'sender': identity,
+            'recipient': self.recipient,
+            'value': self.value,
+            'time': str(self.time)
+        })
+    
+    def sign_transaction(self):
+        # Get the sender's private key and sign the transaction data.
+        private_key = self.sender._private_key
+        signer = PKCS1_v1_5.new(private_key)
+        # Create a SHA hash of the transaction's dictionary.
+        h = SHA.new(str(self.to_dict()).encode('utf8'))
+        return binascii.hexlify(signer.sign(h)).decode('ascii')
+
+def display_transaction(transaction):
+    tx_dict = transaction.to_dict()
+    print("sender: " + tx_dict['sender'])
+    print("-----")
+    print("recipient: " + tx_dict['recipient'])
+    print("-----")
+    print("value: " + str(tx_dict['value']))
+    print("-----")
+    print("time: " + tx_dict['time'])
+    print("-----")
+
+# Testing the Transaction class:
+# Create two clients (ensure the Client class is defined and imported).
+dinesh = Client()
+ramesh = Client()
+
+# Create a transaction from Dinesh to Ramesh (using Ramesh's identity).
+t = Transaction(dinesh, ramesh.identity, 5.0)
+
+# Sign the transaction.
+signature = t.sign_transaction()
+print("Signature: " + signature)
+
+# Display the transaction details.
+display_transaction(t)
