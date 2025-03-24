@@ -1,0 +1,178 @@
+import rsa
+import hashlib
+import json
+from datetime import datetime
+
+#############################
+# a. Client Class
+#############################
+class Client:
+    def __init__(self):
+        # Generate a pair of RSA keys (512 bits for demonstration purposes)
+        (self.public_key, self.private_key) = rsa.newkeys(512)
+
+    def __str__(self):
+        return f'Client(Public: {self.public_key}, Private: {self.private_key})'
+
+#############################
+# b. Transaction Class
+#############################
+class Transaction:
+    def __init__(self, sender, receiver, amount):
+        # The sender and receiver are represented by their public keys.
+        self.sender = sender
+        self.receiver = receiver
+        self.amount = amount
+        self.timestamp = str(datetime.now())
+        self.signature = None
+
+    def to_dict(self):
+        # Convert transaction details to a dictionary (without the signature)
+        return {
+            'sender': self.sender.save_pkcs1().decode('utf-8'),
+            'receiver': self.receiver.save_pkcs1().decode('utf-8'),
+            'amount': self.amount,
+            'timestamp': self.timestamp
+        }
+
+    def sign_transaction(self, private_key):
+        # Sign the transaction using the sender's private key.
+        message = json.dumps(self.to_dict(), sort_keys=True).encode('utf-8')
+        self.signature = rsa.sign(message, private_key, 'SHA-1')
+
+    def verify_transaction(self):
+        # Verify the signature using the sender's public key.
+        message = json.dumps(self.to_dict(), sort_keys=True).encode('utf-8')
+        try:
+            rsa.verify(message, self.signature, self.sender)
+            return True
+        except Exception as e:
+            return False
+
+    def __str__(self):
+        return json.dumps(self.to_dict(), indent=4)
+
+#############################
+# c. Multiple Transactions
+#############################
+# (This part is demonstrated in the testing code below by creating several transactions.)
+
+#############################
+# d. Blockchain and Genesis Block
+#############################
+class Block:
+    def __init__(self, index, transactions, previous_hash, timestamp=None, nonce=0):
+        self.index = index
+        self.transactions = transactions  # List of Transaction objects.
+        self.previous_hash = previous_hash
+        self.timestamp = timestamp or str(datetime.now())
+        self.nonce = nonce
+        self.hash = self.compute_hash()
+
+    def compute_hash(self):
+        # Create a SHA-256 hash of the block's contents.
+        block_string = json.dumps({
+            'index': self.index,
+            'transactions': [tx.to_dict() for tx in self.transactions],
+            'previous_hash': self.previous_hash,
+            'timestamp': self.timestamp,
+            'nonce': self.nonce
+        }, sort_keys=True).encode()
+        return hashlib.sha256(block_string).hexdigest()
+
+    #############################
+    # e. Mining Function
+    #############################
+    def mine(self, difficulty):
+        # Proof-of-Work: find a hash that starts with a specific number of zeros.
+        prefix_str = '0' * difficulty
+        while not self.hash.startswith(prefix_str):
+            self.nonce += 1
+            self.hash = self.compute_hash()
+        print(f"Block mined: {self.hash}")
+
+class Blockchain:
+    def __init__(self):
+        self.chain = []
+        self.difficulty = 2  # Set the mining difficulty (number of leading zeros)
+        self.create_genesis_block()
+
+    def create_genesis_block(self):
+        # Create the first block in the blockchain with previous hash "0".
+        genesis_block = Block(0, [], "0")
+        genesis_block.mine(self.difficulty)
+        self.chain.append(genesis_block)
+
+    def add_block(self, block):
+        # Set the previous hash to the hash of the last block and mine the new block.
+        block.previous_hash = self.chain[-1].hash
+        block.mine(self.difficulty)
+        self.chain.append(block)
+
+    #############################
+    # f. Dump the Blockchain
+    #############################
+    def dump_chain(self):
+        for block in self.chain:
+            print("---------------")
+            print(f"Index: {block.index}")
+            print(f"Timestamp: {block.timestamp}")
+            print(f"Previous Hash: {block.previous_hash}")
+            print(f"Nonce: {block.nonce}")
+            print(f"Hash: {block.hash}")
+            print("Transactions:")
+            for tx in block.transactions:
+                print(tx)
+            print("---------------")
+
+#############################
+# Testing the Implementation
+#############################
+def main():
+    # a. Test: Create clients and generate keys.
+    print("Generating client keys:")
+    client1 = Client()
+    client2 = Client()
+    print("Client 1 Public Key:", client1.public_key)
+    print("Client 2 Public Key:", client2.public_key)
+    print("\n")
+
+    # b. Test: Create a transaction and sign it.
+    print("Creating and signing a transaction:")
+    tx1 = Transaction(client1.public_key, client2.public_key, 10)
+    tx1.sign_transaction(client1.private_key)
+    print("Transaction valid:", tx1.verify_transaction())
+    print("Transaction details:")
+    print(tx1)
+    print("\n")
+
+    # c. Test: Create multiple transactions and display them.
+    print("Creating multiple transactions:")
+    tx2 = Transaction(client2.public_key, client1.public_key, 5)
+    tx2.sign_transaction(client2.private_key)
+    tx3 = Transaction(client1.public_key, client2.public_key, 2.5)
+    tx3.sign_transaction(client1.private_key)
+    transactions = [tx1, tx2, tx3]
+    for tx in transactions:
+        print(tx)
+    print("\n")
+
+    # d. Test: Create a blockchain with a genesis block.
+    print("Creating blockchain and genesis block:")
+    blockchain = Blockchain()
+    print("Genesis Block in the blockchain:")
+    blockchain.dump_chain()
+    print("\n")
+
+    # e. Test: Mine a new block containing our transactions.
+    print("Mining a new block with transactions:")
+    new_block = Block(index=len(blockchain.chain), transactions=transactions, previous_hash=blockchain.chain[-1].hash)
+    new_block.mine(blockchain.difficulty)
+
+    # f. Test: Add the mined block to the blockchain and dump the chain.
+    blockchain.add_block(new_block)
+    print("Updated Blockchain:")
+    blockchain.dump_chain()
+
+if __name__ == "__main__":
+    main()
