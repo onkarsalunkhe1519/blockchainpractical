@@ -1,0 +1,21 @@
+1. Go to the official Bitcoin Core website.(bitcoincore.org) and install.
+
+ Open cmd and run following command  bitcoin-qt.exe -testnet
+
+ Click on create new wallet   
+
+ Give wallet name and click on encrypt wallet  
+
+add label aamount message  Click on receive and create a new receiving address add
+
+Copy receiving address   
+
+Go to any of the following website
+ CoinFaucet  
+ Bitcoin Faucet  
+ paste receiving address
+
+
+ 8.Click on send and enter the bitcoin address in pay to
+
+ 9. Balance will update in overview 
