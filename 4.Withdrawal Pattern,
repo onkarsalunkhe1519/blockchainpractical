@@ -1,0 +1,146 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+
+/* 
+------------------------------------------------------
+  c. Libraries, Assembly, Events, Error Handling
+------------------------------------------------------
+*/
+library MathLib {
+    // Example library event
+    event LibEvent(uint indexed value);
+
+    // Basic addition function
+    function add(uint a, uint b) internal pure returns (uint) {
+        return a + b;
+    }
+
+    // Example of using inline assembly for multiplication
+    function mulAssembly(uint a, uint b) internal pure returns (uint c) {
+        assembly {
+            c := mul(a, b)
+        }
+    }
+}
+
+/*
+------------------------------------------------------
+  a. Withdrawal Pattern & Restricted Access
+------------------------------------------------------
+*/
+contract MyWallet {
+    // Using a custom error for restricted access
+    error Unauthorized();
+    error InsufficientBalance();
+
+    // State variables
+    address public owner;
+    mapping(address => uint) public balances;
+
+    // Events for logging deposits and withdrawals
+    event Deposit(address indexed sender, uint amount);
+    event Withdraw(address indexed recipient, uint amount);
+
+    // Modifier to restrict access to the contract owner
+    modifier onlyOwner() {
+        if (msg.sender != owner) {
+            revert Unauthorized();
+        }
+        _;
+    }
+
+    // Constructor sets the owner to the deployer
+    constructor() {
+        owner = msg.sender;
+    }
+
+    // Deposit function: users can send Ether to the contract
+    function deposit() external payable {
+        balances[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+
+    // Withdrawal Pattern:
+    // - Users "pull" funds by calling `withdraw` themselves.
+    // - This avoids re-entrancy vulnerabilities if followed carefully.
+    function withdraw(uint amount) external {
+        if (balances[msg.sender] < amount) {
+            revert InsufficientBalance();
+        }
+        // Update balance before transferring
+        balances[msg.sender] -= amount;
+
+        // Transfer the requested amount to the sender
+        payable(msg.sender).transfer(amount);
+        emit Withdraw(msg.sender, amount);
+    }
+
+    // Only the owner can withdraw all the contract’s balance
+    function withdrawAllOwner() external onlyOwner {
+        uint contractBalance = address(this).balance;
+        // Transfer all funds to owner
+        payable(owner).transfer(contractBalance);
+        emit Withdraw(owner, contractBalance);
+    }
+}
+
+/*
+------------------------------------------------------
+  b. Contracts, Inheritance, Constructors,
+     Abstract Contracts, Interfaces
+------------------------------------------------------
+*/
+
+// Abstract contract: defines functions that must be implemented
+abstract contract AbstractBase {
+    function greet() public view virtual returns (string memory);
+    function setValue(uint _val) public virtual;
+}
+
+// Simple interface
+interface IExample {
+    function getValue() external view returns (uint);
+}
+
+// Derived contract implementing both AbstractBase and IExample
+contract DerivedContract is AbstractBase, IExample {
+    uint private val;
+    string private greeting;
+
+    // Constructor: sets an initial greeting
+    constructor(string memory _greeting) {
+        greeting = _greeting;
+    }
+
+    // Implementation of AbstractBase.greet()
+    function greet() public view override returns (string memory) {
+        return greeting;
+    }
+
+    // Implementation of AbstractBase.setValue()
+    function setValue(uint _val) public override {
+        val = _val;
+    }
+
+    // Implementation of IExample.getValue()
+    function getValue() external view override returns (uint) {
+        return val;
+    }
+}
+
+/*
+------------------------------------------------------
+  c. Libraries, Assembly, Events, Error Handling
+     (continued)
+------------------------------------------------------
+*/
+// Demonstration of using the MathLib library
+contract TestMath {
+    using MathLib for uint;
+
+    // Use library functions to compute sum and product
+    function compute(uint a, uint b) external pure returns (uint sum, uint product) {
+        sum = a.add(b);                // library function
+        product = MathLib.mulAssembly(a, b);  // inline assembly
+    }
+}
