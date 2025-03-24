@@ -1,0 +1,125 @@
+Step 1 – add metamask extension in your browser.  
+Step 2 – download ganache and click on quick start 
+Step 3 – default transaction will display in ganache.   
+Step 4 – goto metamask extension  
+Step 5 – add a custom network in metamask. Give RPC url from ganache software. 
+Step 6 – click on import account  
+Step 7 – copy private key of any account  
+Step 8 – enter copied private key  
+Step 9 – after importing account available balance will displayed in 
+Step 10 – copy any account address
+Step 11 – enter the amount of ether to transfer from one account to other 
+Step 12 – after successfully transferred amount will be updated and message will be 
+displayed as transaction confirmed 
+Step 13 – balance will be updated in ganache  
+
+
+
+more explanation
+
+✅ Step 1 – Add MetaMask Extension in Your Browser
+Open Chrome or Brave.
+
+Go to https://metamask.io
+
+Click Download > Add MetaMask to Chrome.
+
+Setup a new wallet or Import if you already have one.
+
+✅ Step 2 – Download Ganache and Click "Quick Start"
+Download from: https://trufflesuite.com/ganache/
+
+Install and open Ganache.
+
+Click on "Quick Start" to instantly launch a local Ethereum blockchain.
+
+Ganache will generate 10 accounts with 100 ETH each on localhost:7545
+
+✅ Step 3 – Default Transactions Will Display in Ganache
+After startup, you'll see a list of:
+
+Accounts
+
+Balances
+
+Transaction history
+
+Private keys
+
+You will need these addresses and private keys in later steps.
+
+✅ Step 4 – Go to MetaMask Extension
+Open MetaMask (click on the icon near your browser’s address bar).
+
+By default, MetaMask connects to Ethereum Mainnet.
+
+We will now connect it to Ganache.
+
+✅ Step 5 – Add a Custom Network in MetaMask
+Click the network dropdown at the top (e.g., "Ethereum Mainnet")
+
+Select Add Network
+
+Enter the following:
+
+Field	Value
+Network Name	Ganache Localhost
+New RPC URL	http://127.0.0.1:7545
+Chain ID	1337 (or check in Ganache)
+Currency Symbol	ETH
+Block Explorer	(leave blank)
+Click Save
+
+Now MetaMask is connected to your local blockchain.
+
+✅ Step 6 – Click on Import Account in MetaMask
+In MetaMask, click your profile icon → Import Account
+
+You will be asked for a Private Key
+
+✅ Step 7 – Copy Private Key of Any Ganache Account
+In Ganache → Click the key icon next to an account
+
+Copy the Private Key shown
+
+✅ Step 8 – Paste Private Key into MetaMask to Import Account
+In MetaMask → Paste the private key from Ganache
+
+Click Import
+
+Now you should see your Ganache account and 100 ETH in MetaMask
+
+✅ Step 9 – Check Balance Displayed
+Your imported account should now show balance = 100 ETH
+
+You can now send and receive Ether on the Ganache network via MetaMask
+
+✅ Step 10 – Copy Any Account Address
+In Ganache or MetaMask, copy another account's address
+
+You’ll use this as the recipient in the next step
+
+✅ Step 11 – Transfer Ether from One Account to Another
+In MetaMask, click Send
+
+Paste the recipient address
+
+Enter amount (e.g., 5 ETH)
+
+Click Next → then Confirm
+
+✅ Step 12 – Wait for Transaction Confirmation
+In seconds, MetaMask will show:
+
+Transaction Confirmed
+
+Ganache will display the new transaction in the Transactions Tab
+
+✅ Step 13 – Verify Balance Updated in Ganache
+Go back to Ganache
+
+The sender’s balance will be reduced
+
+The recipient’s balance will be increased
+
+🎉 You have now successfully simulated an Ethereum transaction on your local blockchain network!
