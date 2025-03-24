@@ -1,0 +1,146 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Demo {
+    // -------------------------------------------------
+    // a. Variables, Operators, Loops, Decision Making,
+    //    Strings, Arrays, Enums, Structs, Mappings,
+    //    Conversions, Ether Units, Special Variables.
+    // -------------------------------------------------
+    
+    // Basic variables
+    uint public myUint = 100;
+    int public myInt = -50;
+    bool public myBool = true;
+    address public myAddress;
+    string public myString = "Hello, Solidity!";
+    
+    // Array
+    uint[] public myArray;
+    
+    // Enum
+    enum Status { Pending, Active, Inactive }
+    Status public status;
+    
+    // Struct
+    struct Person {
+        string name;
+        uint age;
+    }
+    Person public person;
+    
+    // Mapping (e.g., for account balances)
+    mapping(address => uint) public balances;
+    
+    // Special variables will be used in functions (msg.sender, block.timestamp, etc.)
+    
+    // Owner for function modifier demonstration
+    address public owner;
+    
+    // -------------------------------------------------
+    // b. Functions, Function Modifiers, View Functions,
+    //    Pure Functions, Fallback Function,
+    //    Function Overloading, Mathematical functions,
+    //    Cryptographic functions.
+    // -------------------------------------------------
+    
+    // Modifier to restrict access only to the contract owner.
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+    
+    // Constructor to initialize state variables.
+    constructor() {
+        owner = msg.sender;
+        myAddress = msg.sender;
+        // Initialize array with some values.
+        myArray.push(10);
+        myArray.push(20);
+        // Set enum status.
+        status = Status.Pending;
+        // Initialize struct Person.
+        person = Person("Alice", 30);
+        // Set an initial balance for the contract deployer.
+        balances[msg.sender] = 1000;
+    }
+    
+    // Fallback function: Called when no other function matches or when Ether is sent with data.
+    fallback() external payable {
+        // Update balance for sender.
+        balances[msg.sender] += msg.value;
+    }
+    
+    // Receive function: Handles plain Ether transfers.
+    receive() external payable {
+        balances[msg.sender] += msg.value;
+    }
+    
+    // Function demonstrating loops, decision making, and operators.
+    // Sums numbers from 1 to _num: adds even numbers and subtracts odd numbers.
+    function loopAndDecision(uint _num) public pure returns (int) {
+        int sum = 0;
+        for (uint i = 1; i <= _num; i++) {
+            if (i % 2 == 0) {
+                sum += int(i);
+            } else {
+                sum -= int(i);
+            }
+        }
+        return sum;
+    }
+    
+    // Function overloading: Two functions with the same name but different parameters.
+    function overloadedFunction(uint a) public pure returns (uint) {
+        // Returns the square of a.
+        return a * a;
+    }
+    
+    function overloadedFunction(uint a, uint b) public pure returns (uint) {
+        // Returns the sum of a and b.
+        return a + b;
+    }
+    
+    // A view function that returns the person's details.
+    function getPerson() public view returns (string memory, uint) {
+        return (person.name, person.age);
+    }
+    
+    // A pure function that adds two numbers.
+    function add(uint a, uint b) public pure returns (uint) {
+        return a + b;
+    }
+    
+    // Mathematical function: Calculates product and remainder.
+    function calculate(uint a, uint b) public pure returns (uint product, uint remainder) {
+        product = a * b;
+        remainder = a % b;
+    }
+    
+    // Cryptographic function: Returns the keccak256 hash of the input data.
+    function hashData(string memory data) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(data));
+    }
+    
+    // Function demonstrating Ether units and conversions.
+    // The function accepts Ether (in wei) and updates the sender's balance.
+    function depositEther() public payable {
+        // 1 ether = 1e18 wei.
+        balances[msg.sender] += msg.value;
+    }
+    
+    // Conversion example: Converts an address to a uint.
+    function addressToUint(address _addr) public pure returns (uint) {
+        return uint160(_addr);
+    }
+    
+    // Function that uses special variables: msg.sender and block.timestamp.
+    function getSenderAndTime() public view returns (address, uint) {
+        return (msg.sender, block.timestamp);
+    }
+    
+    // Function restricted by a modifier: Only the owner can call this.
+    function ownerOnlyFunction() public view onlyOwner returns (string memory) {
+        return "This is only callable by the contract owner.";
+    }
+}
